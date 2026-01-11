@@ -6,9 +6,9 @@
 SCRIPT_URL="https://raw.githubusercontent.com/didimozg/Zabbix-Temperature-CPU-Linux-Phyton/refs/heads/main/zbx_py_cputemp.py"
 SCRIPT_DIR="/etc/zabbix/scripts"
 SCRIPT_PATH="$SCRIPT_DIR/zbx_py_cputemp.py"
-# Путь для конфига (Agent 2 default)
+# Agent 2 default
 CONFIG_FILE="/etc/zabbix/zabbix_agent2.d/python_cputemp.conf"
-# Fallback для старого агента
+# Agent 1 default
 CONFIG_FILE_OLD="/etc/zabbix/zabbix_agentd.d/python_cputemp.conf"
 
 # === Checks ===
