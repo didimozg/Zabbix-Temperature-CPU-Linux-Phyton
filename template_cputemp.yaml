@@ -1,0 +1,159 @@
+zabbix_export:
+  version: '7.4'
+  template_groups:
+    - uuid: '21307fd56eff482eb158144422cf060c'
+      name: Templates
+  templates:
+    - uuid: '55cef54281284d3cbba2b6135186b9b6'
+      template: 'Template Python CPU Temp'
+      name: 'Template Python CPU Temp'
+      description: |
+        Advanced CPU Temperature monitoring using direct Sysfs reading via Python.
+        
+        Triggers logic (Best Practices):
+        - Noticeable (>70C): delay 30m
+        - Warning (>80C): delay 10m
+        - Average (>90C): delay 3m
+        - Critical (>95C): delay 1m
+        - Emergency (>100C): instant
+        
+        Requires: /etc/zabbix/scripts/zbx_py_cputemp.py
+      groups:
+        - name: Templates
+      items:
+        - uuid: '869136b9bdc74f089c222d5a5a76b838'
+          name: 'CPU Temperature: Average'
+          key: 'py.cputemp[avg]'
+          delay: 15s
+          history: 30d
+          value_type: FLOAT
+          units: °C
+          tags:
+            - tag: Application
+              value: Temperature
+        - uuid: 'edb8c38ae26649f5b72690fed0098a26'
+          name: 'CPU Temperature: Max'
+          key: 'py.cputemp[max]'
+          delay: 15s
+          history: 30d
+          value_type: FLOAT
+          units: °C
+          tags:
+            - tag: Application
+              value: Temperature
+          triggers:
+            - uuid: 'c7cc6f7ed7024e84b2c37204e78a4cf4'
+              expression: 'min(/Template Python CPU Temp/py.cputemp[max],30m)>70'
+              name: 'CPU Temp: Noticeable load (> 70°C for 30m)'
+              priority: INFO
+              manual_close: 'YES'
+            - uuid: '18cb9ebb920549598fa4315ff4008840'
+              expression: 'min(/Template Python CPU Temp/py.cputemp[max],10m)>80'
+              name: 'CPU Temp: Warning (> 80°C for 10m)'
+              priority: WARNING
+              manual_close: 'YES'
+            - uuid: 'aa8b2028f6ff48a7aa9f2c0faf922438'
+              expression: 'min(/Template Python CPU Temp/py.cputemp[max],3m)>90'
+              name: 'CPU Temp: High Load / Throttling (> 90°C for 3m)'
+              priority: AVERAGE
+              manual_close: 'YES'
+            - uuid: '607c197518dc423a9e521422936af8f3'
+              expression: 'min(/Template Python CPU Temp/py.cputemp[max],1m)>95'
+              name: 'CPU Temp: Critical (> 95°C for 1m)'
+              priority: HIGH
+              manual_close: 'YES'
+            - uuid: 'e2f551a03a4846f780dc7b9fdb22bceb'
+              expression: 'last(/Template Python CPU Temp/py.cputemp[max])>100'
+              name: 'CPU Temp: Emergency (> 100°C)'
+              priority: DISASTER
+        - uuid: 'd5ec188d02e54a728cd307fabf07319e'
+          name: 'CPU Temperature: Min'
+          key: 'py.cputemp[min]'
+          delay: 15s
+          history: 30d
+          value_type: FLOAT
+          units: °C
+          tags:
+            - tag: Application
+              value: Temperature
+      discovery_rules:
+        - uuid: 'a64eeb40bda04246a82933a23fadc931'
+          name: 'Core Discovery'
+          key: 'py.cputemp[discovery]'
+          delay: 1h
+          item_prototypes:
+            - uuid: '24d91016191644d9b471660e8aa2fdcd'
+              name: 'CPU Core Temp: {#SENSOR_LABEL}'
+              key: 'py.cputemp[value,"{#SENSOR_PATH}"]'
+              delay: 15s
+              history: 30d
+              value_type: FLOAT
+              units: °C
+              tags:
+                - tag: Application
+                  value: 'Temperature Cores'
+              trigger_prototypes:
+                - uuid: '0fbe73a728764ea68d2ac27af1e65bb7'
+                  expression: 'min(/Template Python CPU Temp/py.cputemp[value,"{#SENSOR_PATH}"],30m)>70'
+                  name: 'Core {#SENSOR_LABEL} Temp: Noticeable (> 70°C for 30m)'
+                  priority: INFO
+                  manual_close: 'YES'
+                - uuid: 'a81f2801004a4b2fb6f221f421a7d847'
+                  expression: 'min(/Template Python CPU Temp/py.cputemp[value,"{#SENSOR_PATH}"],10m)>80'
+                  name: 'Core {#SENSOR_LABEL} Temp: Warning (> 80°C for 10m)'
+                  priority: WARNING
+                  manual_close: 'YES'
+                - uuid: '44c25804b9d44a7f8d07b5473c5321fd'
+                  expression: 'min(/Template Python CPU Temp/py.cputemp[value,"{#SENSOR_PATH}"],3m)>90'
+                  name: 'Core {#SENSOR_LABEL} Temp: High Load (> 90°C for 3m)'
+                  priority: AVERAGE
+                  manual_close: 'YES'
+                - uuid: '0348485c98b9431ab6a8df325f460fc5'
+                  expression: 'min(/Template Python CPU Temp/py.cputemp[value,"{#SENSOR_PATH}"],1m)>95'
+                  name: 'Core {#SENSOR_LABEL} Temp: Critical (> 95°C for 1m)'
+                  priority: HIGH
+                  manual_close: 'YES'
+                - uuid: 'c24f0885865e4bdd95d4f81d5f3b4514'
+                  expression: 'last(/Template Python CPU Temp/py.cputemp[value,"{#SENSOR_PATH}"])>100'
+                  name: 'Core {#SENSOR_LABEL} Temp: Emergency (> 100°C)'
+                  priority: DISASTER
+          graph_prototypes:
+            - uuid: '9177a89b310e4251a333ca76f02dc736'
+              name: 'CPU Core {#SENSOR_LABEL} Temperature'
+              ymin_type_1: FIXED
+              ymax_type_1: FIXED
+              yaxismin: '30'
+              yaxismax: '110'
+              graph_items:
+                - color: 'FF5555'
+                  item:
+                    host: 'Template Python CPU Temp'
+                    key: 'py.cputemp[value,"{#SENSOR_PATH}"]'
+  graphs:
+    - uuid: '52ab929416d0418b935cc70d00391e7f'
+      name: 'CPU Temperature Aggregated'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      yaxismin: '30'
+      yaxismax: '110'
+      graph_items:
+        - drawtype: FILLED_REGION
+          color: '00AA00'
+          calc_fnc: MIN
+          item:
+            host: 'Template Python CPU Temp'
+            key: 'py.cputemp[min]'
+        - sortorder: '1'
+          drawtype: BOLD_LINE
+          color: '0000AA'
+          calc_fnc: AVG
+          item:
+            host: 'Template Python CPU Temp'
+            key: 'py.cputemp[avg]'
+        - sortorder: '2'
+          drawtype: BOLD_LINE
+          color: 'FF0000'
+          calc_fnc: MAX
+          item:
+            host: 'Template Python CPU Temp'
+            key: 'py.cputemp[max]'
