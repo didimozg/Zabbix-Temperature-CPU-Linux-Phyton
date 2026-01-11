@@ -3,7 +3,6 @@
 # Repo: https://github.com/didimozg/Zabbix-Temperature-CPU-Linux-Phyton
 
 # === Settings ===
-# URL вашего raw-файла
 SCRIPT_URL="https://raw.githubusercontent.com/didimozg/Zabbix-Temperature-CPU-Linux-Phyton/refs/heads/main/zbx_py_cputemp.py"
 SCRIPT_DIR="/etc/zabbix/scripts"
 SCRIPT_PATH="$SCRIPT_DIR/zbx_py_cputemp.py"
@@ -46,7 +45,6 @@ chmod +x "$SCRIPT_PATH"
 echo "✅ Script downloaded and executable set."
 
 # 3. Create Zabbix Config
-# Проверяем, куда писать конфиг (Agent 2 или Agent 1)
 TARGET_CONF="$CONFIG_FILE"
 if [ ! -d "/etc/zabbix/zabbix_agent2.d" ] && [ -d "/etc/zabbix/zabbix_agentd.d" ]; then
     TARGET_CONF="$CONFIG_FILE_OLD"
