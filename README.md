@@ -1,0 +1,1 @@
+# Zabbix-Temperature-CPU-Linux-Phyton
