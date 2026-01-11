@@ -29,8 +29,15 @@ This template uses a **"Funnel Strategy"** for triggers. This filters out short-
 
 ---
 
-## 🛠️ Installation
+## 🛠️ Quick Install (One-Click)
 
+You can install the script and configure the agent automatically with a single command:
+
+```bash
+curl -s https://raw.githubusercontent.com/didimozg/Zabbix-Temperature-CPU-Linux-Phyton/refs/heads/main/install.sh | sudo bash
+
+```
+## 🛠️ Manual Installation:
 ### 1. Python Script
 The script handles core discovery and Sysfs reading.
 
